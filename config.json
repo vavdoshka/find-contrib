@@ -7,5 +7,10 @@
     "language": "JavaScript",
     "labels": ["easy", "beginner"],
     "DaysDelta": "1"
-  }
+  },
+  "publishers": [{
+    "type": "telegram",
+    "token": "",
+    "chat_id": ""
+  }]
 }

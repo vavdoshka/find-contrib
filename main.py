@@ -3,6 +3,10 @@ import json
 import datetime
 import time
 from github import Github
+try:
+    import telepot
+except ImportError:
+    pass
 
 CONFIG = json.load(open("./config.json"))
 LABELS = CONFIG["search"]["labels"]
@@ -13,27 +17,19 @@ ISSUE_CREATED_AT = datetime.datetime.now() -\
 SEARCH_QUERY = "type:issue language:{language} " \
                "state:open no:assignee label:{label} created:>={date}"
 
+class TelegramPublisher(object):
+
+
+    def __init__(self):
+        self.bot = telepot.Bot(CONFIG["publishers"][0]["token"])
+
+    def send_message(self, msg):
+        self.bot.sendMessage(CONFIG["publishers"][0]["chat_id"], msg)
 
 class IssueProxy(object):
 
     def __init__(self, issue):
         self._issue = issue
-
-    @property
-    def issue_url(self):
-        return self._issue.url
-
-    @property
-    def issue_title(self):
-        return self._issue.title
-
-    @property
-    def comments_count(self):
-        return self._issue.comments
-
-    @property
-    def labels(self):
-        return [label.name for label in self._issue.labels]
 
     @property
     def repository_identity(self):
@@ -50,11 +46,7 @@ class IssueProxy(object):
 
     def __str__(self):
         return """
-        Title: {0.issue_title}
-        Url: {0.issue_url}
-        Labels: {0.labels}
-        Comments Count: {0.comments_count}
-
+        {0._issue.html_url}
         Repository Name: {0.repository_identity}
         Repository Stars Count: {0.repository_stars_count}
         Repository Forks Count: {0.repository_forks_count}
@@ -72,6 +64,10 @@ def main():
                                 language=LANGUAGE)))
 
     issues = [IssueProxy(issue) for issue in (chain(*results))]
+    tb = TelegramPublisher()
+    for issue in issues:
+        tb.send_message(str(issue))
 
-# TODO: throw a message to telgramm + email?
+main()
+# TODO: prettify output
 # TODO: cron this.
