@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "user": "",
+    "password": ""
+  },
+  "search": {
+    "language": "JavaScript",
+    "labels": ["easy", "beginner"],
+    "DaysDelta": "1"
+  }
+}
